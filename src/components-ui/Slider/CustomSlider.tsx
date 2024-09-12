@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./CustomSlider.css";
 
 interface ICustomSliderProps {
@@ -14,45 +14,39 @@ interface ICustomSliderProps {
 
 export default function CustomSlider({ data, width, height, title }: ICustomSliderProps) {
 
-    const [touchXData, setTouchXData] = useState<number>(0);
-    const [moveXData, setMoveXData] = useState<number>(0);
-    const [newTransformX, setNewTransformX] = useState<number>(0);
+    const [scrollStartPos, setScrollStartPos] = useState<number>(0);
+    const [isScrolling, setIsScrolling] = useState<boolean>(false);
     const [params, setParams] = useState({ width, height });
-
-
-    const handleMouseDown = (e: any) => {   
-        setTouchXData(e.clientX);
-    };
-
+    const ref = useRef<HTMLDivElement>(null);
+    
     const handleSwipeNext = (e: any) => {
         e.stopPropagation();
-        setNewTransformX(prev => prev - 200);
+        if (ref.current) {
+            ref.current.scrollLeft += 100;
+        }
     };
 
     const handleSwipePrev = (e: any) => {
         e.stopPropagation();
-        setNewTransformX(prev => prev + 200);
+        if (ref.current) {
+            ref.current.scrollLeft -= 100;
+        }
     };
 
+    const handleMouseDown = (e: any) => {   
+        setIsScrolling(true);
+        setScrollStartPos(e.clientX);
+    };
+    
     const handleMouseUp = (e: any) => {
-        const difference = moveXData - touchXData;
-        const imageWidth = +width.split("px")[0];
-        const maxDifference = (data.length+1 - (window.innerWidth / imageWidth)) * imageWidth;
-        setNewTransformX(prev => {
-            if (prev + difference <= -maxDifference) {
-                return prev;
-            }          
-            if (prev + difference > 0) {
-                return 0;
-            }
-            return prev + difference;
-        }); 
-        setTouchXData(0);
+        setIsScrolling(false);
     };
 
     const handleMouseMove = (e: any) => {
-        if (touchXData !== 0) {
-            setMoveXData(e.clientX);
+        if (isScrolling) {
+            if (ref.current) {
+                ref.current.scrollLeft += (scrollStartPos - e.clientX) / 10;
+            }
         }
     };
 
@@ -63,18 +57,18 @@ export default function CustomSlider({ data, width, height, title }: ICustomSlid
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
         >
-            <div className="title">Рандомные стили</div>
+            <div className="title">{title}</div>
             <div className="actions">
                 <div className="round" onClick={handleSwipePrev}>{'<'}</div>
                 <div className="round" onClick={handleSwipeNext}>{'>'}</div>
             </div>
-            <div className="customSliderSlides">
+            <div className="customSliderSlides" ref={ref}>
                 {
                     data.map(el => (
                         <div
                             className="customSliderCurrentImage"
                             style={{
-                                transform: `translateX(${newTransformX}px)`,
+                                transform: `translateX(180px)`,
                                 transition: "0.5s"
                             }}
                             key={el.img}
@@ -87,7 +81,7 @@ export default function CustomSlider({ data, width, height, title }: ICustomSlid
                                 onClick={(e) => e.preventDefault()}
                                 draggable={false}
                             />
-                            <div className="title">{el.title}</div>
+                            <div className="slide-title">{el.title}</div>
                             <div className="sub-title">{el.subTitle}</div>
                         </div>
                     ))

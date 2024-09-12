@@ -28,14 +28,30 @@
 }
 .customSliderSlides {
     display: flex;
-    width: 500px;
+    width: 100vw;
+    overflow-y: hidden;
+    overflow-x: scroll;
     column-gap: 15px;
 }
+
+.customSliderSlides::-webkit-scrollbar {
+    width: 5px;           
+}
+.customSliderSlides::-webkit-scrollbar-track {
+    background: transparent; 
+}
+.customSliderSlides::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 20px;  
+    border: transparent;
+}
+
 .customSlider>.title {
     font-family: "Golos Text", sans-serif;
     color: white;
     font-size: 50px;
     font-weight: 600;
+    margin-left: 180px;
 }
 
 .customSliderCurrentImage {
@@ -45,16 +61,14 @@
 .customSliderCurrentImage>img {
     border-radius: 25px;
 }
-.title, .subTitle {
-    font-family: "Golos Text", sans-serif;
-    color: white;
-}
-.title {
+.customSliderCurrentImage>.slide-title {
     font-size: 20px;
     line-height: 30px;
     font-weight: 600;
+    color: white;
 }
-.sub-title {
+
+.customSliderCurrentImage>.sub-title {
     font-family: "Golos Text", sans-serif;
     font-size: 18px;
     line-height: 25px;
